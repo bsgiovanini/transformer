@@ -9,8 +9,8 @@ import spacy
 class Tokenizer:
 
     def __init__(self):
-        self.spacy_de = spacy.load('de')
-        self.spacy_en = spacy.load('en')
+        self.spacy_de = spacy.load('de_dep_news_trf')
+        self.spacy_en = spacy.load('en_core_web_trf')
 
     def tokenize_de(self, text):
         """

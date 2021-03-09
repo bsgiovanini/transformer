@@ -47,7 +47,7 @@ optimizer = Adam(params=model.parameters(),
 scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer=optimizer,
                                                  verbose=True,
                                                  factor=factor,
-                                                 min_lr=min_lr,
+                                                 min_lr=init_lr,
                                                  patience=patience)
 
 criterion = nn.CrossEntropyLoss(ignore_index=src_pad_idx)
@@ -71,7 +71,8 @@ def train(model, iterator, optimizer, criterion, clip):
         optimizer.step()
 
         epoch_loss += loss.item()
-        print('step :', round((i / len(iterator)) * 100, 2), '% , loss :', loss.item())
+        print('step :', round((i / len(iterator)) * 100, 2),
+              '% , loss :', loss.item())
 
     return epoch_loss / len(iterator)
 
@@ -96,8 +97,10 @@ def evaluate(model, iterator, criterion):
                 try:
                     trg_words = idx_to_word(batch.trg[j], loader.target.vocab)
                     output_words = output[j].max(dim=1)[1]
-                    output_words = idx_to_word(output_words, loader.target.vocab)
-                    bleu = get_bleu(hypotheses=output_words.split(), reference=trg_words.split())
+                    output_words = idx_to_word(
+                        output_words, loader.target.vocab)
+                    bleu = get_bleu(hypotheses=output_words.split(),
+                                    reference=trg_words.split())
                     total_bleu.append(bleu)
                 except:
                     pass
@@ -127,7 +130,8 @@ def run(total_epoch, best_loss):
 
         if valid_loss < best_loss:
             best_loss = valid_loss
-            torch.save(model.state_dict(), 'saved/model-{0}.pt'.format(valid_loss))
+            torch.save(model.state_dict(),
+                       'saved/model-{0}.pt'.format(valid_loss))
 
         f = open('result/train_loss.txt', 'w')
         f.write(str(train_losses))
@@ -142,8 +146,10 @@ def run(total_epoch, best_loss):
         f.close()
 
         print(f'Epoch: {step + 1} | Time: {epoch_mins}m {epoch_secs}s')
-        print(f'\tTrain Loss: {train_loss:.3f} | Train PPL: {math.exp(train_loss):7.3f}')
-        print(f'\tVal Loss: {valid_loss:.3f} |  Val PPL: {math.exp(valid_loss):7.3f}')
+        print(
+            f'\tTrain Loss: {train_loss:.3f} | Train PPL: {math.exp(train_loss):7.3f}')
+        print(
+            f'\tVal Loss: {valid_loss:.3f} |  Val PPL: {math.exp(valid_loss):7.3f}')
         print(f'\tBLEU Score: {bleu:.3f}')
 
 
